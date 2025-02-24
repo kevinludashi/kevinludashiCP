@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>kevin的彩票自助随机选号助手</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: rgb(38, 38, 38);
+            color: white;
+            overflow-x: hidden; /* 防止横向滚动条 */
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-size: clamp(1.5rem, 5vw, 2.5rem); /* 动态字体大小 */
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+            white-space: nowrap; /* 禁止换行 */
+            text-align: center;
+            max-width: 90vw; /* 确保标题不会超出屏幕宽度 */
+            overflow: hidden; /* 隐藏溢出部分 */
+            text-overflow: ellipsis; /* 超出部分显示省略号 */
+        }
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            width: 90vw; /* 容器宽度为屏幕宽度的 90% */
+            max-width: 90vw;
+            overflow-y: auto; /* 允许容器内滚动 */
+        }
+        .inner-container {
+            width: 85%; /* 内部功能区宽度为容器宽度的 85% */
+            margin: 0 auto;
+        }
+        select, input, button {
+            margin: 10px;
+            padding: 10px 15px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        select {
+            background-color: white;
+            color: #333;
+            width: 100%;
+            max-width: 300px;
+        }
+        input {
+            background-color: white;
+            color: #333;
+            text-align: center;
+            width: 80px;
+        }
+        button {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        .numbers {
+            display: flex;
+            flex-wrap: nowrap; /* 禁止换行 */
+            justify-content: center; /* 居中对齐 */
+            margin-top: 10px;
+            width: 90vw; /* 容器宽度为屏幕宽度的 90% */
+            overflow-x: auto; /* 水平滚动 */
+            padding-bottom: 10px; /* 添加底部内边距，避免滚动条遮挡内容 */
+        }
+        
+        .number {
+            margin: 2px; /* 号码球之间的间距 */
+            padding: 8px 12px; /* 内边距，适当缩小 */
+            border-radius: 50%; /* 圆形样式 */
+            color: white; /* 字体颜色 */
+            font-size: clamp(18px, 5vw, 26px); /* 动态调整字体大小 */
+            font-weight: bold; /* 加粗字体 */
+            flex-shrink: 0; /* 防止号码被压缩 */
+        }
+        .red { background-color: #e74c3c; }
+        .blue { background-color: #3498db; }
+        .green { background-color: #2ecc71; }
+        .yellow { background-color: #f1c40f; color: black; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        /* 横屏按钮样式 */
+        #landscapeButton {
+            display: none;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #landscapeButton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+        }
+        /* 横屏模式样式 */
+        .fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgb(38, 38, 38);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            overflow-y: auto; /* 允许全屏模式下滚动 */
+        }
+        .fullscreen .numbers {
+            flex-direction: row;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+        }
+        .fullscreen .number {
+            font-size: 36px;
+            padding: 20px 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>kevin的彩票自助随机选号助手</h1>
+    <div class="container">
+        <label for="lotteryType">选择彩票类型：</label>
+        <select id="lotteryType">
+            <option value="ssq">双色球（福彩） - 红球6个，蓝球1个</option>
+            <option value="dlt">大乐透（体彩） - 前区5个，后区2个</option>
+            <option value="fc3d">福彩3D（福彩） - 3个数字</option>
+            <option value="pl3">排列三（体彩） - 3个数字</option>
+            <option value="pl5">排列五（体彩） - 5个数字</option>
+            <option value="qxc">七星彩（体彩） - 7个数字</option>
+            <option value="qlc">七乐彩（福彩） - 7个数字</option>
+            <option value="kl8">快乐8（体彩） - 20个数字</option>
+        </select>
+        <label for="numSets">注数：</label>
+        <input type="number" id="numSets" value="1" min="1">
+        <button onclick="generateNumbers()">生成号码</button>
+        <div class="result" id="result"></div>
+
+        <!-- 中奖查询下拉框 -->
+        <label for="queryLinks" style="margin-top: 20px;">中奖查询：</label>
+        <select id="queryLinks" onchange="openLink(this)">
+            <option value="">请选择查询链接</option>
+            <option value="https://www.cwl.gov.cn/">福彩官网</option>
+            <option value="https://www.lottery.gov.cn/">体彩官网</option>
+            <option value="https://www.cwl.gov.cn/ygkj/wqkjgg/ssq/">双色球（福彩）中奖信息</option>
+            <option value="https://www.lottery.gov.cn/kj/kjlb.html?dlt">大乐透（体彩）中奖信息</option>
+            <option value="https://www.lottery.gov.cn/kj/kjlb.html?pls">排列三（体彩）中奖信息</option>
+            <option value="https://www.lottery.gov.cn/kj/kjlb.html?plw">排列五（体彩）中奖信息</option>
+            <option value="https://www.lottery.gov.cn/kj/kjlb.html?qxc">七星彩（体彩）中奖信息</option>
+            <option value="https://www.cwl.gov.cn/ygkj/wqkjgg/ssq/">快乐8（福彩）中奖信息</option>
+            <option value="https://www.cwl.gov.cn/ygkj/wqkjgg/ssq/">福彩3D（福彩）中奖信息</option>
+            <option value="https://www.cwl.gov.cn/ygkj/wqkjgg/ssq/">七乐彩（福彩）中奖信息</option>
+        </select>
+
+        <!-- 横屏显示按钮 -->
+        <button id="landscapeButton" onclick="enterFullscreen()">横屏显示号码</button>
+    </div>
+
+    <!-- 全屏显示容器 -->
+    <div id="fullscreenContainer" class="fullscreen" style="display: none;">
+        <div class="numbers" id="fullscreenNumbers"></div>
+        <button onclick="exitFullscreen()" style="margin-top: 20px; padding: 10px 20px; background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">退出全屏</button>
+    </div>
+
+    <script>
+        function generateNumbers() {
+            const lotteryType = document.getElementById('lotteryType').value;
+            const numSets = parseInt(document.getElementById('numSets').value);
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '';
+            for (let i = 0; i < numSets; i++) {
+                let numbers = [];
+                if (lotteryType === 'ssq') {
+                    numbers = [
+                        { nums: getRandomNumbers(6, 1, 33).sort((a, b) => a - b), color: 'red' },
+                        { nums: getRandomNumbers(1, 1, 16), color: 'blue' }
+                    ];
+                } else if (lotteryType === 'dlt') {
+                    numbers = [
+                        { nums: getRandomNumbers(5, 1, 35).sort((a, b) => a - b), color: 'red' },
+                        { nums: getRandomNumbers(2, 1, 12).sort((a, b) => a - b), color: 'blue' }
+                    ];
+                } else if (lotteryType === 'fc3d') {
+                    numbers = [{ nums: getRandomNumbers(3, 0, 9), color: 'red' }];
+                } else if (lotteryType === 'pl3') {
+                    numbers = [{ nums: getRandomNumbers(3, 0, 9), color: 'red' }];
+                } else if (lotteryType === 'pl5') {
+                    numbers = [{ nums: getRandomNumbers(5, 0, 9), color: 'red' }];
+                } else if (lotteryType === 'qxc') {
+                    numbers = [{ nums: getRandomNumbers(7, 0, 9), color: 'red' }];
+                } else if (lotteryType === 'qlc') {
+                    numbers = [{ nums: getRandomNumbers(7, 1, 30).sort((a, b) => a - b), color: 'red' }];
+                } else if (lotteryType === 'kl8') {
+                    numbers = [{ nums: getRandomNumbers(20, 1, 80).sort((a, b) => a - b), color: 'green' }];
+                }
+                const numbersDiv = document.createElement('div');
+                numbersDiv.className = 'numbers';
+                numbers.forEach(group => {
+                    group.nums.forEach(num => {
+                        const numberSpan = document.createElement('span');
+                        numberSpan.className = `number ${group.color}`;
+                        numberSpan.textContent = num;
+                        numbersDiv.appendChild(numberSpan);
+                    });
+                });
+                resultDiv.appendChild(numbersDiv);
+            }
+        }
+
+        function getRandomNumbers(count, min, max) {
+            const numbers = [];
+            while (numbers.length < count) {
+                const num = Math.floor(Math.random() * (max - min + 1)) + min;
+                if (!numbers.includes(num)) {
+                    numbers.push(num);
+                }
+            }
+            return numbers;
+        }
+
+        // 打开选中的链接
+        function openLink(selectElement) {
+            const selectedValue = selectElement.value;
+            if (selectedValue) {
+                window.open(selectedValue, '_blank');
+                selectElement.selectedIndex = 0; // 重置下拉框
+            }
+        }
+
+        // 进入全屏模式
+        function enterFullscreen() {
+            const fullscreenContainer = document.getElementById('fullscreenContainer');
+            const fullscreenNumbers = document.getElementById('fullscreenNumbers');
+            const resultNumbers = document.querySelectorAll('.result .numbers');
+
+            // 将生成的号码复制到全屏容器中
+            fullscreenNumbers.innerHTML = '';
+            resultNumbers.forEach(numbersDiv => {
+                fullscreenNumbers.appendChild(numbersDiv.cloneNode(true));
+            });
+
+            // 显示全屏容器，隐藏主容器
+            fullscreenContainer.style.display = 'flex';
+            document.querySelector('.container').style.display = 'none';
+        }
+
+        // 退出全屏模式
+        function exitFullscreen() {
+            const fullscreenContainer = document.getElementById('fullscreenContainer');
+
+            // 隐藏全屏容器，显示主容器
+            fullscreenContainer.style.display = 'none';
+            document.querySelector('.container').style.display = 'block';
+        }
+
+        // 动态检测横屏模式并显示/隐藏按钮
+        function updateLandscapeButtonVisibility() {
+            const landscapeButton = document.getElementById('landscapeButton');
+            const isLandscape = window.innerWidth > window.innerHeight; // 判断是否为横屏
+            const isMobile = window.innerWidth <= 768; // 判断是否为移动设备
+
+            if (isMobile && isLandscape) {
+                landscapeButton.style.display = 'block';
+            } else {
+                landscapeButton.style.display = 'none';
+            }
+        }
+
+        // 初始化时检测一次屏幕方向
+        updateLandscapeButtonVisibility();
+
+        // 监听屏幕尺寸变化
+        window.addEventListener('resize', updateLandscapeButtonVisibility);
+
+        // 页面加载完成后滚动到顶部
+        window.onload = () => {
+            window.scrollTo(0, 0);
+        };
+    </script>
+</body>
+</html>
