@@ -1,312 +1,1687 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>kevin的彩票自助随机选号助手</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background-color: rgb(38, 38, 38);
-            color: white;
-            overflow-x: hidden; /* 防止横向滚动条 */
-        }
-        h1 {
-            margin-bottom: 20px;
-            font-size: clamp(1.5rem, 5vw, 2.5rem); /* 动态字体大小 */
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
-            white-space: nowrap; /* 禁止换行 */
-            text-align: center;
-            max-width: 90vw; /* 确保标题不会超出屏幕宽度 */
-            overflow: hidden; /* 隐藏溢出部分 */
-            text-overflow: ellipsis; /* 超出部分显示省略号 */
-        }
-        .container {
-            text-align: center;
-            background: rgba(255, 255, 255, 0.9);
-            color: #333;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            width: 90vw; /* 容器宽度为屏幕宽度的 90% */
-            max-width: 90vw;
-            overflow-y: auto; /* 允许容器内滚动 */
-        }
-        .inner-container {
-            width: 85%; /* 内部功能区宽度为容器宽度的 85% */
-            margin: 0 auto;
-        }
-        select, input, button {
-            margin: 10px;
-            padding: 10px 15px;
-            font-size: 16px;
-            border: none;
-            border-radius: 8px;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-        select {
-            background-color: white;
-            color: #333;
-            width: 100%;
-            max-width: 300px;
-        }
-        input {
-            background-color: white;
-            color: #333;
-            text-align: center;
-            width: 80px;
-        }
-        button {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-        }
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
-        }
-        .result {
-            margin-top: 20px;
-            font-size: 18px;
-        }
-        .numbers {
-            display: flex;
-            flex-wrap: nowrap; /* 禁止换行 */
-            justify-content: center; /* 居中对齐 */
-            margin-top: 10px;
-            width: 90vw; /* 容器宽度为屏幕宽度的 90% */
-            overflow-x: auto; /* 水平滚动 */
-            padding-bottom: 10px; /* 添加底部内边距，避免滚动条遮挡内容 */
-        }
-        
-        .number {
-            margin: 2px; /* 号码球之间的间距 */
-            padding: 8px 12px; /* 内边距，适当缩小 */
-            border-radius: 50%; /* 圆形样式 */
-            color: white; /* 字体颜色 */
-            font-size: clamp(18px, 5vw, 26px); /* 动态调整字体大小 */
-            font-weight: bold; /* 加粗字体 */
-            flex-shrink: 0; /* 防止号码被压缩 */
-        }
-        .red { background-color: #e74c3c; }
-        .blue { background-color: #3498db; }
-        .green { background-color: #2ecc71; }
-        .yellow { background-color: #f1c40f; color: black; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        /* 横屏按钮样式 */
-        #landscapeButton {
-            display: none;
-            margin-top: 20px;
-            padding: 10px 20px;
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        #landscapeButton:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
-        }
-        /* 横屏模式样式 */
-        .fullscreen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: rgb(38, 38, 38);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            overflow-y: auto; /* 允许全屏模式下滚动 */
-        }
-        .fullscreen .numbers {
-            flex-direction: row;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-        }
-        .fullscreen .number {
-            font-size: 36px;
-            padding: 20px 30px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>自研智能彩票号码生成器</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* ========== Reset & Base ========== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { width: 100%; height: 100%; }
+    body {
+      width: 100%; min-height: 100%; overflow-x: hidden; overflow-y: auto;
+      font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0a1628;
+      color: #d6e4f0;
+      -webkit-tap-highlight-color: transparent;
+      position: relative;
+    }
+    body {
+      background: radial-gradient(ellipse at 15% 0%, #0a2a5c 0%, #0a1628 35%, #0d1f3c 70%, #0a1628 100%);
+      padding: 0 0 20px 0;
+    }
+    body::before {
+      content: ''; position: fixed; top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background:
+        radial-gradient(circle at 20% 15%, rgba(33,150,243,0.08) 0%, transparent 45%),
+        radial-gradient(circle at 80% 85%, rgba(13,71,161,0.06) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(66,165,245,0.03) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+    ::-webkit-scrollbar { width: 0; height: 0; }
+
+    /* ========== Container ========== */
+    .app { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 0 14px; }
+
+    /* ========== Header ========== */
+    .header {
+      padding: 24px 0 14px; text-align: center;
+      position: relative;
+    }
+    .header::after {
+      content: ''; position: absolute; bottom: 0; left: 5%; right: 5%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(33,150,243,0.5), rgba(66,165,245,0.5), transparent);
+    }
+    .header-icon { font-size: 30px; display: block; margin-bottom: 2px; }
+    .header h1 {
+      font-family: 'Orbitron', monospace; font-size: 20px; font-weight: 900;
+      background: linear-gradient(135deg, #64B5F6, #1E88E5, #0D47A1, #1E88E5);
+      background-size: 300% 300%;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradShift 4s ease infinite;
+      letter-spacing: 2px;
+    }
+    @keyframes gradShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .header p {
+      font-size: 12px; color: rgba(255,255,255,0.35); margin-top: 4px;
+      letter-spacing: 3px; font-weight: 300;
+    }
+
+    /* ========== Glass Card Base ========== */
+    .glass {
+      background: rgba(33, 150, 243, 0.04);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(33, 150, 243, 0.08);
+      border-radius: 14px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    }
+
+    /* ========== Settings Panel ========== */
+    .settings-panel {
+      padding: 18px 16px; margin-top: 14px;
+      position: relative; overflow: visible;
+    }
+    .settings-panel::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, #42A5F5, #1E88E5, #0D47A1, #42A5F5, transparent);
+      background-size: 200% 100%;
+      animation: borderShine 3s ease infinite;
+    }
+    @keyframes borderShine {
+      0% { background-position: 0% 0%; }
+      50% { background-position: 100% 0%; }
+      100% { background-position: 0% 0%; }
+    }
+
+    .setting-group { margin-bottom: 16px; }
+    .setting-group:last-child { margin-bottom: 0; }
+    .setting-label {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7);
+      margin-bottom: 10px; letter-spacing: 0.5px;
+      cursor: pointer; user-select: none;
+    }
+    .setting-label .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #2196F3; box-shadow: 0 0 8px rgba(33,150,243,0.5);
+    }
+    .setting-label .arrow {
+      margin-left: auto; font-size: 10px; color: rgba(255,255,255,0.25);
+      transition: transform 0.3s ease;
+    }
+    .setting-label .arrow.open { transform: rotate(90deg); }
+    .collapse-wrap {
+      overflow: hidden; transition: max-height 0.35s ease, opacity 0.3s ease;
+      max-height: 0; opacity: 0;
+    }
+    .collapse-wrap.open { max-height: 300px; opacity: 1; }
+    .collapse-wrap.open.lottery-collapse { max-height: 500px; }
+
+    /* ========== Number Input ========== */
+    .number-input-wrap {
+      display: flex; align-items: center; justify-content: center; gap: 14px;
+    }
+    .number-input-wrap .btn-minus,
+    .number-input-wrap .btn-plus {
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 1px solid rgba(33,150,243,0.3);
+      background: rgba(33,150,243,0.08);
+      color: #42A5F5; font-size: 20px; font-weight: 300;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s;
+      user-select: none;
+    }
+    .number-input-wrap .btn-minus:active,
+    .number-input-wrap .btn-plus:active {
+      transform: scale(0.9);
+      background: rgba(33,150,243,0.2);
+    }
+    .number-input-wrap input {
+      width: 56px; height: 46px; text-align: center;
+      font-size: 22px; font-weight: 700; font-family: 'Orbitron', monospace;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px; color: #42A5F5;
+      outline: none; transition: border-color 0.2s;
+    }
+    .number-input-wrap input:focus {
+      border-color: rgba(33,150,243,0.5);
+      box-shadow: 0 0 16px rgba(33,150,243,0.1);
+    }
+    .number-input-wrap input::-webkit-inner-spin-button { display: none; }
+
+    /* ========== Lottery Toggle Grid ========== */
+    .lottery-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    }
+    .lottery-chip {
+      display: flex; align-items: center; gap: 6px;
+      padding: 9px 10px; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      cursor: pointer; transition: all 0.25s ease;
+      user-select: none; position: relative; overflow: hidden;
+    }
+    .lottery-chip:active { transform: scale(0.97); }
+    .lottery-chip .ck-box {
+      width: 20px; height: 20px; border-radius: 4px;
+      border: 2px solid rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.25s; flex-shrink: 0;
+      font-size: 12px; color: transparent; font-weight: 700;
+    }
+    .lottery-chip.active { border-color: currentColor; background: rgba(33,150,243,0.08); }
+    .lottery-chip.active .ck-box {
+      background: #2196F3; border-color: #2196F3;
+      color: #fff; font-size: 13px;
+      box-shadow: 0 0 12px rgba(33,150,243,0.4);
+    }
+    .lottery-chip .lname { font-size: 13px; font-weight: 500; }
+    .lottery-chip .l-info {
+      font-size: 14px; cursor: pointer; opacity: 0.3;
+      transition: all 0.2s; flex-shrink: 0; line-height: 1;
+    }
+    .lottery-chip .l-info:hover,
+    .lottery-chip .l-info:active { opacity: 0.8; transform: scale(1.15); }
+    .lottery-chip .lcat {
+      font-size: 10px; padding: 1px 5px; border-radius: 3px;
+      background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.35);
+      white-space: nowrap; margin-left: auto;
+    }
+
+    /* ========== Toolbar ========== */
+    .toolbar {
+      display: flex; gap: 8px; margin-top: 14px;
+    }
+    .toolbar .tb-btn {
+      flex: 1; padding: 10px 0; border: none; border-radius: 10px;
+      font-size: 13px; font-weight: 600; font-family: 'Noto Sans SC', sans-serif;
+      cursor: pointer; transition: all 0.25s;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .toolbar .tb-btn:active { transform: scale(0.97); }
+    .tb-btn.primary {
+      background: linear-gradient(135deg, #1E88E5, #0D47A1, #1565C0);
+      background-size: 200% 100%;
+      color: #fff; box-shadow: 0 4px 24px rgba(30,136,229,0.35);
+      animation: btnShine 3s ease infinite;
+    }
+    @keyframes btnShine {
+      0% { background-position: 0% 0%; }
+      50% { background-position: 100% 0%; }
+      100% { background-position: 0% 0%; }
+    }
+    .tb-btn.secondary {
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.7);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .tb-btn.secondary .icon { font-size: 16px; }
+
+    /* ========== Results Section ========== */
+    .results { margin-top: 18px; display: none; }
+    .results.show { display: block; }
+    .results-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 4px; margin-bottom: 10px; flex-wrap: wrap; gap: 6px;
+    }
+    .results-header .rh-left {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .results-header h2 {
+      font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.6);
+    }
+    .results-header .count {
+      font-size: 12px; color: rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.05);
+      padding: 2px 10px; border-radius: 20px;
+    }
+    .results-header .rh-actions {
+      display: flex; gap: 6px;
+    }
+    .results-header .rh-actions button {
+      padding: 5px 12px; border: none; border-radius: 8px;
+      font-size: 12px; font-weight: 600; font-family: 'Noto Sans SC', sans-serif;
+      cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .results-header .rh-actions button:active { transform: scale(0.95); }
+    .rh-btn-zoom {
+      background: linear-gradient(135deg, #2196F3, #1565C0);
+      color: #fff; box-shadow: 0 2px 12px rgba(33,150,243,0.3);
+    }
+    .rh-btn-zoom:disabled {
+      opacity: 0.3; pointer-events: none;
+    }
+
+    /* ========== Lottery Section ========== */
+    .lottery-section { margin-bottom: 14px; }
+    .lottery-section-header {
+      display: flex; align-items: center; gap: 8px;
+      padding: 0 4px; margin-bottom: 8px;
+    }
+    .lottery-section-header .ls-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      box-shadow: 0 0 10px currentColor;
+    }
+    .lottery-section-header .ls-name {
+      font-size: 14px; font-weight: 600; letter-spacing: 0.5px;
+    }
+    .lottery-section-header .ls-count {
+      font-size: 11px; color: rgba(255,255,255,0.3);
+      margin-left: auto;
+    }
+
+    /* ========== Number Card ========== */
+    .num-card {
+      padding: 12px 14px; margin-bottom: 8px;
+      transition: all 0.25s;
+      position: relative; overflow: visible;
+      display: flex; align-items: flex-start; gap: 10px;
+    }
+    .num-card:active { transform: scale(0.99); }
+    .num-card.checked {
+      border-color: #2196F3;
+      box-shadow: 0 0 20px rgba(33,150,243,0.15), 0 0 0 1px rgba(33,150,243,0.3);
+    }
+    /* Card checkbox */
+    .num-card .card-cb {
+      flex-shrink: 0; margin-top: 2px;
+    }
+    .num-card .card-cb .cb-box {
+      width: 22px; height: 22px; border-radius: 4px;
+      border: 2px solid rgba(255,255,255,0.15);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s;
+      font-size: 12px; color: transparent; font-weight: 700;
+    }
+    .num-card .card-cb .cb-box.checked {
+      background: #2196F3; border-color: #2196F3;
+      color: #fff;
+      box-shadow: 0 0 10px rgba(33,150,243,0.4);
+    }
+    .num-card .card-body { flex: 1; min-width: 0; }
+    .num-card .card-top {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .num-card .card-label {
+      font-size: 11px; color: rgba(255,255,255,0.3); font-weight: 500;
+      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    }
+    .num-card .card-label .extra-badge {
+      display: inline-block; font-size: 13px; font-weight: 900;
+      padding: 2px 12px; border-radius: 12px;
+      background: linear-gradient(135deg, #FF6B35, #e85d2c);
+      color: #fff;
+      box-shadow: 0 0 16px rgba(255,107,53,0.5);
+      animation: extraPulse 1.2s ease-in-out infinite;
+      letter-spacing: 0.5px;
+    }
+    @keyframes extraPulse {
+      0%, 100% { box-shadow: 0 0 10px rgba(255,107,53,0.3); transform: scale(1); }
+      50% { box-shadow: 0 0 24px rgba(255,107,53,0.7); transform: scale(1.05); }
+    }
+    .num-card .card-actions {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .num-card .card-actions .btn-add {
+      width: 26px; height: 26px; border-radius: 50%;
+      border: 1px solid rgba(33,150,243,0.3);
+      background: rgba(33,150,243,0.1);
+      color: #42A5F5; font-size: 16px; font-weight: 300;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s;
+      line-height: 1;
+    }
+    .num-card .card-actions .btn-add:active {
+      transform: scale(0.85);
+      background: rgba(33,150,243,0.25);
+    }
+    .num-card .card-actions .btn-save-sh {
+      font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px;
+      border: 1px solid rgba(46,204,113,0.3);
+      background: rgba(46,204,113,0.1);
+      color: #2ECC71; cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; gap: 2px;
+      white-space: nowrap;
+    }
+    .num-card .card-actions .btn-save-sh:active {
+      transform: scale(0.9);
+      background: rgba(46,204,113,0.2);
+    }
+    .num-card .card-actions .btn-save-sh.saved {
+      background: rgba(46,204,113,0.2);
+      border-color: #2ECC71;
+      box-shadow: 0 0 10px rgba(46,204,113,0.3);
+    }
+    .num-card .card-actions .btn-zoom {
+      width: 26px; height: 26px; border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.4);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s;
+      font-size: 14px;
+    }
+    .num-card .card-actions .btn-zoom:active {
+      background: rgba(255,255,255,0.12);
+      transform: scale(0.9);
+    }
+
+    /* ========== Ball Display ========== */
+    .balls {
+      display: flex; flex-wrap: wrap; gap: 5px; align-items: center;
+    }
+    .ball {
+      width: 30px; height: 30px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; font-family: 'Noto Sans SC', sans-serif;
+      flex-shrink: 0;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      box-shadow: inset 0 -2px 4px rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.2);
+      transition: all 0.2s;
+    }
+    .ball.orange { background: linear-gradient(135deg, #FF6B35, #e85d2c); box-shadow: 0 2px 10px rgba(255,107,53,0.3); }
+    .ball.blue { background: linear-gradient(135deg, #42A5F5, #1E88E5); box-shadow: 0 2px 10px rgba(66,165,245,0.3); }
+    .ball.red { background: linear-gradient(135deg, #E74C3C, #c0392b); box-shadow: 0 2px 10px rgba(231,76,60,0.3); }
+    .ball.green { background: linear-gradient(135deg, #2ECC71, #27ae60); box-shadow: 0 2px 10px rgba(46,204,113,0.3); }
+    .ball.purple { background: linear-gradient(135deg, #9B59B6, #8e44ad); box-shadow: 0 2px 10px rgba(155,89,182,0.3); }
+    .ball.gold { background: linear-gradient(135deg, #F1C40F, #f39c12); box-shadow: 0 2px 10px rgba(241,196,15,0.3); color: #1a1a2e; }
+    .ball.teal { background: linear-gradient(135deg, #1ABC9C, #16a085); box-shadow: 0 2px 10px rgba(26,188,156,0.3); }
+    .ball.pink { background: linear-gradient(135deg, #E91E63, #c2185b); box-shadow: 0 2px 10px rgba(233,30,99,0.3); }
+    .ball.cyan { background: linear-gradient(135deg, #00d4ff, #0099cc); box-shadow: 0 2px 10px rgba(0,212,255,0.3); }
+    .ball.digit {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: linear-gradient(135deg, rgba(33,150,243,0.15), rgba(13,71,161,0.15));
+      border: 1px solid rgba(33,150,243,0.2);
+      font-size: 16px; font-weight: 700;
+    }
+    .ball.small { width: 24px; height: 24px; font-size: 10px; }
+
+    .balls .sep {
+      width: 4px; height: 4px; border-radius: 50%;
+      background: rgba(255,255,255,0.12); margin: 0 1px;
+    }
+    .balls .zone-label {
+      font-size: 10px; color: rgba(255,255,255,0.25);
+      margin-right: 1px; font-weight: 500;
+    }
+
+    /* ========== Fullscreen Overlay ========== */
+    .overlay {
+      display: none; position: fixed; inset: 0; z-index: 9999;
+      background: rgba(6, 16, 36, 0.96);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      flex-direction: column; align-items: center; justify-content: center;
+      touch-action: none;
+    }
+    .overlay.show { display: flex; }
+
+    .overlay .o-top {
+      position: absolute; top: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 18px; z-index: 10;
+    }
+    .overlay .o-info {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .overlay .o-info .o-name {
+      font-size: 15px; font-weight: 700; letter-spacing: 1px;
+    }
+    .overlay .o-info .o-group {
+      font-size: 11px; color: rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.06);
+      padding: 2px 8px; border-radius: 20px;
+    }
+    .overlay .o-close {
+      width: 34px; height: 34px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      color: #fff; font-size: 18px; font-weight: 300;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .overlay .o-close:active { background: rgba(255,255,255,0.12); transform: scale(0.9); }
+
+    .overlay .o-hint {
+      position: absolute; bottom: 20px; left: 0; right: 0;
+      text-align: center;
+      font-size: 11px; color: rgba(255,255,255,0.15);
+      letter-spacing: 2px;
+      animation: hintPulse 2s ease-in-out infinite;
+    }
+    @keyframes hintPulse {
+      0%, 100% { opacity: 0.15; }
+      50% { opacity: 0.4; }
+    }
+
+    .overlay .o-content {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      width: 100%; padding: 0 16px; max-height: 80vh; overflow-y: auto;
+    }
+    .overlay .o-multi-group {
+      width: 100%; margin-bottom: 12px; text-align: center;
+    }
+    .overlay .o-multi-group:last-child { margin-bottom: 0; }
+    .overlay .o-multi-group .omg-label {
+      font-size: 11px; color: rgba(255,255,255,0.25);
+      margin-bottom: 6px; letter-spacing: 1px;
+      display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap;
+    }
+    .overlay .o-multi-group .omg-label .extra-badge {
+      display: inline-block; font-size: 14px; font-weight: 900;
+      padding: 2px 14px; border-radius: 12px; color: #fff;
+      letter-spacing: 0.5px;
+      animation: extraPulse 1.2s ease-in-out infinite;
+    }
+    .overlay .o-balls {
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center;
+      max-width: 100%;
+    }
+    .overlay .o-ball {
+      width: 48px; height: 48px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 700; font-family: 'Noto Sans SC', sans-serif;
+      flex-shrink: 0;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.3), inset 0 -3px 6px rgba(0,0,0,0.2);
+      animation: ballPop 0.3s ease-out backwards;
+    }
+    @keyframes ballPop {
+      from { transform: scale(0.5); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .overlay .o-ball.orange { background: linear-gradient(135deg, #FF6B35, #e85d2c); box-shadow: 0 4px 20px rgba(255,107,53,0.4); }
+    .overlay .o-ball.blue { background: linear-gradient(135deg, #42A5F5, #1E88E5); box-shadow: 0 4px 20px rgba(66,165,245,0.4); }
+    .overlay .o-ball.red { background: linear-gradient(135deg, #E74C3C, #c0392b); box-shadow: 0 4px 20px rgba(231,76,60,0.4); }
+    .overlay .o-ball.green { background: linear-gradient(135deg, #2ECC71, #27ae60); box-shadow: 0 4px 20px rgba(46,204,113,0.4); }
+    .overlay .o-ball.purple { background: linear-gradient(135deg, #9B59B6, #8e44ad); box-shadow: 0 4px 20px rgba(155,89,182,0.4); }
+    .overlay .o-ball.gold { background: linear-gradient(135deg, #F1C40F, #f39c12); box-shadow: 0 4px 20px rgba(241,196,15,0.4); color: #1a1a2e; }
+    .overlay .o-ball.teal { background: linear-gradient(135deg, #1ABC9C, #16a085); box-shadow: 0 4px 20px rgba(26,188,156,0.4); }
+    .overlay .o-ball.pink { background: linear-gradient(135deg, #E91E63, #c2185b); box-shadow: 0 4px 20px rgba(233,30,99,0.4); }
+    .overlay .o-ball.cyan { background: linear-gradient(135deg, #00d4ff, #0099cc); box-shadow: 0 4px 20px rgba(0,212,255,0.4); }
+    .overlay .o-ball.digit {
+      width: 52px; height: 52px; border-radius: 10px;
+      background: linear-gradient(135deg, rgba(33,150,243,0.12), rgba(13,71,161,0.12));
+      border: 2px solid rgba(33,150,243,0.2);
+      font-size: 22px;
+    }
+    .overlay .o-ball.small { width: 36px; height: 36px; font-size: 14px; }
+
+    .overlay .o-sep {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+    }
+    .overlay .o-zone-label {
+      font-size: 11px; color: rgba(255,255,255,0.25);
+      font-weight: 500; letter-spacing: 1px;
+    }
+
+    @media (orientation: landscape) {
+      .overlay .o-content { flex-direction: row; flex-wrap: wrap; gap: 12px; justify-content: center; }
+      .overlay .o-multi-group { width: auto; margin-bottom: 0; }
+      .overlay .o-ball { width: 60px; height: 60px; font-size: 26px; }
+      .overlay .o-ball.digit { width: 64px; height: 64px; font-size: 28px; }
+      .overlay .o-ball.small { width: 44px; height: 44px; font-size: 18px; }
+      .overlay .o-hint { display: none; }
+    }
+
+    /* ========== 守号 Modal ========== */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 9998;
+      background: rgba(4, 8, 20, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      align-items: flex-end; justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      width: 100%; max-width: 480px; max-height: 85vh;
+      background: rgba(10, 22, 40, 0.95);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-radius: 20px 20px 0 0;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-bottom: none;
+      padding: 20px 18px 28px;
+      overflow-y: auto;
+      animation: slideUp 0.3s ease-out;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .modal .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .modal .modal-header h3 {
+      font-size: 17px; font-weight: 700;
+      background: linear-gradient(135deg, #42A5F5, #1565C0);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .modal .modal-close {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      color: #fff; font-size: 16px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .modal .modal-close:active { background: rgba(255,255,255,0.1); }
+
+    .modal .sh-item {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px; padding: 12px 14px; margin-bottom: 10px;
+    }
+    .modal .sh-item .sh-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .modal .sh-item .sh-name {
+      font-size: 14px; font-weight: 600;
+    }
+    .modal .sh-item .sh-actions {
+      display: flex; gap: 6px;
+    }
+    .modal .sh-item .sh-actions button {
+      padding: 4px 10px; border: none; border-radius: 6px;
+      font-size: 11px; font-weight: 600; font-family: 'Noto Sans SC', sans-serif;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .modal .sh-item .sh-actions button:active { transform: scale(0.95); }
+    .modal .sh-item .sh-actions .btn-gen {
+      background: rgba(33,150,243,0.15); color: #42A5F5;
+    }
+    .modal .sh-item .sh-actions .btn-clear {
+      background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4);
+    }
+    .modal .sh-item .sh-actions .btn-save {
+      background: linear-gradient(135deg, #2196F3, #1565C0);
+      color: #fff; padding: 4px 14px;
+    }
+    .modal .sh-item .sh-balls {
+      display: flex; flex-wrap: wrap; gap: 4px; align-items: center;
+    }
+    .modal .sh-item .sh-actions-row {
+      display: flex; gap: 6px; margin-top: 8px;
+    }
+    .modal .sh-item .sh-actions-row button {
+      padding: 6px 14px; border: none; border-radius: 8px;
+      font-size: 12px; font-weight: 700; font-family: 'Noto Sans SC', sans-serif;
+      cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .modal .sh-item .sh-actions-row button:active { transform: scale(0.95); }
+    .modal .sh-item .sh-actions-row .btn-sh-zoom {
+      background: rgba(33,150,243,0.15); color: #42A5F5;
+    }
+    .modal .sh-item .sh-actions-row .btn-sh-add {
+      background: linear-gradient(135deg, #FF6B35, #e85d2c);
+      color: #fff; box-shadow: 0 2px 12px rgba(255,107,53,0.3);
+    }
+    .modal .sh-empty {
+      text-align: center; padding: 30px 0;
+      color: rgba(255,255,255,0.25); font-size: 14px;
+    }
+    .modal .sh-hint {
+      font-size: 12px; color: rgba(255,255,255,0.2);
+      margin-top: 12px; text-align: center;
+    }
+
+    /* ========== Rule Modal ========== */
+    .rule-modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 9997;
+      background: rgba(4, 8, 20, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      align-items: center; justify-content: center;
+    }
+    .rule-modal-overlay.show { display: flex; }
+    .rule-modal {
+      width: calc(100% - 48px); max-width: 380px;
+      background: rgba(10, 22, 40, 0.96);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 24px 22px 20px;
+      animation: fadeScale 0.25s ease-out;
+    }
+    @keyframes fadeScale {
+      from { transform: scale(0.85); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .rule-modal .rm-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .rule-modal .rm-header .rm-title {
+      font-size: 18px; font-weight: 700;
+    }
+    .rule-modal .rm-header .rm-close {
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      color: #fff; font-size: 14px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .rule-modal .rm-body {
+      font-size: 14px; line-height: 1.8;
+      color: rgba(255,255,255,0.7);
+    }
+    .rule-modal .rm-body .rm-desc {
+      font-size: 12px; color: rgba(255,255,255,0.35);
+      margin-top: 8px; padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    /* ========== Footer ========== */
+    .footer {
+      margin-top: 24px; padding: 16px 0 20px;
+      text-align: center; position: relative;
+    }
+    .footer::before {
+      content: ''; position: absolute; top: 0; left: 20%; right: 20%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(33,150,243,0.2), transparent);
+    }
+    .footer p {
+      font-size: 11px; color: rgba(255,255,255,0.2);
+      line-height: 1.8; letter-spacing: 0.5px;
+    }
+    .footer .ver {
+      font-family: 'Orbitron', monospace; font-size: 10px;
+      color: rgba(255,255,255,0.12);
+    }
+
+    /* ========== Responsive ========== */
+    @media (max-width: 360px) {
+      .ball { width: 26px; height: 26px; font-size: 11px; }
+      .ball.digit { width: 30px; height: 30px; font-size: 14px; }
+      .overlay .o-ball { width: 40px; height: 40px; font-size: 17px; }
+      .overlay .o-ball.digit { width: 44px; height: 44px; font-size: 19px; }
+      .overlay .o-ball.small { width: 30px; height: 30px; font-size: 12px; }
+      .lottery-chip { padding: 8px; }
+      .lottery-chip .lname { font-size: 12px; }
+    }
+    @media (min-width: 600px) {
+      .app { max-width: 560px; }
+      .lottery-grid { grid-template-columns: 1fr 1fr 1fr; }
+      .ball { width: 34px; height: 34px; font-size: 14px; }
+      .overlay .o-ball { width: 68px; height: 68px; font-size: 30px; }
+      .overlay .o-ball.digit { width: 72px; height: 72px; font-size: 32px; }
+      .overlay .o-ball.small { width: 50px; height: 50px; font-size: 22px; }
+    }
+
+    .hidden { display: none !important; }
+  </style>
 </head>
 <body>
-    <h1>kevin的彩票自助随机选号助手</h1>
-    <div class="container">
-        <label for="lotteryType">选择彩票类型：</label>
-        <select id="lotteryType">
-            <option value="ssq">双色球（福彩） - 红球6个，蓝球1个</option>
-            <option value="dlt">大乐透（体彩） - 前区5个，后区2个</option>
-            <option value="fc3d">福彩3D（福彩） - 3个数字</option>
-            <option value="pl3">排列三（体彩） - 3个数字</option>
-            <option value="pl5">排列五（体彩） - 5个数字</option>
-            <option value="qxc">七星彩（体彩） - 7个数字</option>
-            <option value="qlc">七乐彩（福彩） - 7个数字</option>
-            <option value="kl8">快乐8（体彩） - 20个数字</option>
-        </select>
-        <label for="numSets">注数：</label>
-        <input type="number" id="numSets" value="1" min="1">
-        <button onclick="generateNumbers()">生成号码</button>
-        <div class="result" id="result"></div>
 
-        <!-- 中奖查询下拉框 -->
-        <label for="queryLinks" style="margin-top: 20px;">中奖查询：</label>
-        <select id="queryLinks" onchange="openLink(this)">
-            <option value="">请选择查询链接</option>
-            <option value="https://www.cwl.gov.cn/">福彩官网</option>
-            <option value="https://www.lottery.gov.cn/">体彩官网</option>
-            <option value="https://www.cwl.gov.cn/ygkj/wqkjgg/ssq/">双色球（福彩）中奖信息</option>
-            <option value="https://www.lottery.gov.cn/kj/kjlb.html?dlt">大乐透（体彩）中奖信息</option>
-            <option value="https://www.lottery.gov.cn/kj/kjlb.html?pls">排列三（体彩）中奖信息</option>
-            <option value="https://www.lottery.gov.cn/kj/kjlb.html?plw">排列五（体彩）中奖信息</option>
-            <option value="https://www.lottery.gov.cn/kj/kjlb.html?qxc">七星彩（体彩）中奖信息</option>
-            <option value="https://www.cwl.gov.cn/ygkj/wqkjgg/ssq/">快乐8（福彩）中奖信息</option>
-            <option value="https://www.cwl.gov.cn/ygkj/wqkjgg/ssq/">福彩3D（福彩）中奖信息</option>
-            <option value="https://www.cwl.gov.cn/ygkj/wqkjgg/ssq/">七乐彩（福彩）中奖信息</option>
-        </select>
+<div class="app" id="app">
 
-        <!-- 横屏显示按钮 -->
-        <button id="landscapeButton" onclick="enterFullscreen()">横屏显示号码</button>
+  <!-- ========== Header ========== -->
+  <div class="header">
+    <span class="header-icon">🎰</span>
+    <h1>LOTTO·AI</h1>
+    <p>自研智能彩票号码生成器</p>
+  </div>
+
+  <!-- ========== Settings Panel ========== -->
+  <div class="settings-panel glass">
+    <!-- 组数设置 (默认折叠) -->
+    <div class="setting-group">
+      <div class="setting-label" onclick="toggleCollapse(this)">
+        <span class="dot"></span>
+        每组出几注号码
+        <span class="arrow">▶</span>
+      </div>
+      <div class="collapse-wrap" id="collapseGroupCount">
+        <div class="number-input-wrap" style="padding-top:4px;">
+          <div class="btn-minus" id="btnMinus">−</div>
+          <input type="number" id="groupCount" value="1" min="1" max="99">
+          <div class="btn-plus" id="btnPlus">+</div>
+        </div>
+      </div>
     </div>
 
-    <!-- 全屏显示容器 -->
-    <div id="fullscreenContainer" class="fullscreen" style="display: none;">
-        <div class="numbers" id="fullscreenNumbers"></div>
-        <button onclick="exitFullscreen()" style="margin-top: 20px; padding: 10px 20px; background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">退出全屏</button>
+    <!-- 彩票选择 (默认折叠) -->
+    <div class="setting-group">
+      <div class="setting-label" onclick="toggleCollapse(this)">
+        <span class="dot" style="background:#1565C0;box-shadow:0 0 8px rgba(21,101,192,0.5);"></span>
+        选择彩票种类
+        <span class="arrow">▶</span>
+      </div>
+      <div class="collapse-wrap lottery-collapse" id="collapseLottery">
+        <div class="lottery-grid" id="lotteryGrid" style="padding-top:4px;"></div>
+      </div>
     </div>
 
-    <script>
-        function generateNumbers() {
-            const lotteryType = document.getElementById('lotteryType').value;
-            const numSets = parseInt(document.getElementById('numSets').value);
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = '';
-            for (let i = 0; i < numSets; i++) {
-                let numbers = [];
-                if (lotteryType === 'ssq') {
-                    numbers = [
-                        { nums: getRandomNumbers(6, 1, 33).sort((a, b) => a - b), color: 'red' },
-                        { nums: getRandomNumbers(1, 1, 16), color: 'blue' }
-                    ];
-                } else if (lotteryType === 'dlt') {
-                    numbers = [
-                        { nums: getRandomNumbers(5, 1, 35).sort((a, b) => a - b), color: 'red' },
-                        { nums: getRandomNumbers(2, 1, 12).sort((a, b) => a - b), color: 'blue' }
-                    ];
-                } else if (lotteryType === 'fc3d') {
-                    numbers = [{ nums: getRandomNumbers(3, 0, 9), color: 'red' }];
-                } else if (lotteryType === 'pl3') {
-                    numbers = [{ nums: getRandomNumbers(3, 0, 9), color: 'red' }];
-                } else if (lotteryType === 'pl5') {
-                    numbers = [{ nums: getRandomNumbers(5, 0, 9), color: 'red' }];
-                } else if (lotteryType === 'qxc') {
-                    numbers = [{ nums: getRandomNumbers(7, 0, 9), color: 'red' }];
-                } else if (lotteryType === 'qlc') {
-                    numbers = [{ nums: getRandomNumbers(7, 1, 30).sort((a, b) => a - b), color: 'red' }];
-                } else if (lotteryType === 'kl8') {
-                    numbers = [{ nums: getRandomNumbers(20, 1, 80).sort((a, b) => a - b), color: 'green' }];
-                }
-                const numbersDiv = document.createElement('div');
-                numbersDiv.className = 'numbers';
-                numbers.forEach(group => {
-                    group.nums.forEach(num => {
-                        const numberSpan = document.createElement('span');
-                        numberSpan.className = `number ${group.color}`;
-                        numberSpan.textContent = num;
-                        numbersDiv.appendChild(numberSpan);
-                    });
-                });
-                resultDiv.appendChild(numbersDiv);
-            }
+    <!-- 生成模式 -->
+    <div class="setting-group">
+      <div class="setting-label">
+        <span class="dot" style="background:#42A5F5;box-shadow:0 0 8px rgba(66,165,245,0.5);"></span>
+        🎲 随机生成
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <button class="tb-btn primary" id="genBtn">
+        <span>✦</span> 一键生成
+      </button>
+      <button class="tb-btn secondary" id="shouhaoBtn">
+        <span class="icon">🔒</span> 守号
+      </button>
+    </div>
+  </div>
+
+  <!-- ========== Results ========== -->
+  <div class="results" id="results">
+    <div class="results-header">
+      <div class="rh-left">
+        <h2>📊 生成结果</h2>
+        <span class="count" id="resultCount">0 注</span>
+      </div>
+      <div class="rh-actions">
+        <button class="rh-btn-zoom" id="zoomSelectedBtn" disabled>
+          🔍 放大选中 <span id="zoomCount">0</span>
+        </button>
+      </div>
+    </div>
+    <div id="resultsContent"></div>
+  </div>
+
+  <!-- ========== Empty State ========== -->
+  <div class="empty-state" id="emptyState" style="text-align:center;padding:40px 20px;margin-top:16px;">
+    <div style="font-size:48px;opacity:0.3;margin-bottom:12px;">🎲</div>
+    <div style="font-size:14px;color:rgba(255,255,255,0.25);">
+      选择彩票种类，点击生成按钮<br>试试你的运气吧 ✨
+    </div>
+  </div>
+
+  <!-- ========== Rule Modal ========== -->
+<div class="rule-modal-overlay" id="ruleModal">
+  <div class="rule-modal">
+    <div class="rm-header">
+      <span class="rm-title" id="rmTitle">大乐透</span>
+      <button class="rm-close" id="rmClose">✕</button>
+    </div>
+    <div class="rm-body" id="rmBody">选号规则说明</div>
+  </div>
+</div>
+
+<!-- ========== Footer ========== -->
+  <div class="footer">
+    <p>2026©️ | 作者：kevin鲁大师 版权所有 盗版必究</p>
+    <p class="ver">版本号：V260907-01</p>
+  </div>
+
+</div>
+
+<!-- ========== Fullscreen Overlay ========== -->
+<div class="overlay" id="overlay">
+  <div class="o-top">
+    <div class="o-info">
+      <span class="o-name" id="oName">大乐透</span>
+      <span class="o-group" id="oGroup">共 1 组</span>
+    </div>
+    <button class="o-close" id="oClose">✕</button>
+  </div>
+  <div class="o-content" id="oContent"></div>
+  <div class="o-hint">← 左右滑动切换 →</div>
+</div>
+
+<!-- ========== 守号 Modal ========== -->
+<div class="modal-overlay" id="shouhaoModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>🔒 我的守号</h3>
+      <button class="modal-close" id="shouhaoClose">✕</button>
+    </div>
+    <div id="shouhaoContent"></div>
+    <div class="sh-hint">💡 守号号码会一直保留，生成时选择「守号模式」即可使用</div>
+  </div>
+</div>
+
+<script>
+// =============================================
+// 彩票配置
+// =============================================
+const LOTTERIES = {
+  dlt: {
+    id: 'dlt', name: '大乐透', color: '#FF6B35', cat: '体彩',
+    desc: '前5+后2', defaultChecked: true,
+    rule: '前区从01-35中选5个号码，后区从01-12中选2个号码，号码不可重复。每周一、三、六开奖。',
+    generate: () => {
+      const front = pickN(1, 35, 5);
+      const back = pickN(1, 12, 2);
+      return { front, back, frontLabel: '前区', backLabel: '后区',
+        frontClass: 'orange', backClass: 'blue' };
+    },
+    renderBalls: (d) => {
+      const f = d.front.map(n => ball(n, d.frontClass));
+      const b = d.back.map(n => ball(n, d.backClass));
+      return [...f, sep(), ...b];
+    },
+    renderOverlayBalls: (d) => {
+      const f = d.front.map(n => oBall(n, d.frontClass));
+      const b = d.back.map(n => oBall(n, d.backClass));
+      return [oZoneLabel(d.frontLabel), ...f, oSep(), oZoneLabel(d.backLabel), ...b];
+    },
+    renderShouhaoBalls: (d) => {
+      const f = d.front.map(n => sBall(n, d.frontClass));
+      const b = d.back.map(n => sBall(n, d.backClass));
+      return [...f, sep(), ...b];
+    },
+    toStr: (d) => d.front.join(',') + '|' + d.back.join(','),
+    fromStr: (s) => {
+      const [f, b] = s.split('|');
+      return { front: f.split(',').map(Number), back: b.split(',').map(Number),
+        frontLabel: '前区', backLabel: '后区', frontClass: 'orange', backClass: 'blue' };
+    }
+  },
+  ssq: {
+    id: 'ssq', name: '双色球', color: '#E74C3C', cat: '福彩',
+    desc: '红6+蓝1', defaultChecked: false,
+    rule: '红球从01-33中选6个号码，蓝球从01-16中选1个号码，号码不可重复。每周二、四、日开奖。',
+    generate: () => {
+      const front = pickN(1, 33, 6);
+      const back = pickN(1, 16, 1);
+      return { front, back, frontLabel: '红球', backLabel: '蓝球',
+        frontClass: 'red', backClass: 'blue' };
+    },
+    renderBalls: (d) => {
+      const f = d.front.map(n => ball(n, d.frontClass));
+      const b = d.back.map(n => ball(n, d.backClass));
+      return [...f, sep(), ...b];
+    },
+    renderOverlayBalls: (d) => {
+      const f = d.front.map(n => oBall(n, d.frontClass));
+      const b = d.back.map(n => oBall(n, d.backClass));
+      return [oZoneLabel(d.frontLabel), ...f, oSep(), oZoneLabel(d.backLabel), ...b];
+    },
+    renderShouhaoBalls: (d) => {
+      const f = d.front.map(n => sBall(n, d.frontClass));
+      const b = d.back.map(n => sBall(n, d.backClass));
+      return [...f, sep(), ...b];
+    },
+    toStr: (d) => d.front.join(',') + '|' + d.back.join(','),
+    fromStr: (s) => {
+      const [f, b] = s.split('|');
+      return { front: f.split(',').map(Number), back: b.split(',').map(Number),
+        frontLabel: '红球', backLabel: '蓝球', frontClass: 'red', backClass: 'blue' };
+    }
+  },
+  fc3d: {
+    id: 'fc3d', name: '福彩3D', color: '#42A5F5', cat: '福彩',
+    desc: '3位数字', defaultChecked: false,
+    rule: '从000-999中选一个3位数，每位从0-9中选择，号码可重复。每天开奖。',
+    generate: () => ({ digits: Array.from({length:3},()=>randInt(0,9)) }),
+    renderBalls: (d) => d.digits.map(n => ball(n, 'digit')),
+    renderOverlayBalls: (d) => d.digits.map(n => oBall(n, 'digit')),
+    renderShouhaoBalls: (d) => d.digits.map(n => sBall(n, 'digit')),
+    toStr: (d) => d.digits.join(','),
+    fromStr: (s) => ({ digits: s.split(',').map(Number) })
+  },
+  pl3: {
+    id: 'pl3', name: '排列三', color: '#2ECC71', cat: '体彩',
+    desc: '3位数字', defaultChecked: false,
+    rule: '从000-999中选一个3位数，每位从0-9中选择，号码可重复。每天开奖。',
+    generate: () => ({ digits: Array.from({length:3},()=>randInt(0,9)) }),
+    renderBalls: (d) => d.digits.map(n => ball(n, 'digit')),
+    renderOverlayBalls: (d) => d.digits.map(n => oBall(n, 'digit')),
+    renderShouhaoBalls: (d) => d.digits.map(n => sBall(n, 'digit')),
+    toStr: (d) => d.digits.join(','),
+    fromStr: (s) => ({ digits: s.split(',').map(Number) })
+  },
+  pl5: {
+    id: 'pl5', name: '排列五', color: '#9B59B6', cat: '体彩',
+    desc: '5位数字', defaultChecked: false,
+    rule: '从00000-99999中选一个5位数，每位从0-9中选择，号码可重复。每天开奖。',
+    generate: () => ({ digits: Array.from({length:5},()=>randInt(0,9)) }),
+    renderBalls: (d) => d.digits.map(n => ball(n, 'digit')),
+    renderOverlayBalls: (d) => d.digits.map(n => oBall(n, 'digit')),
+    renderShouhaoBalls: (d) => d.digits.map(n => sBall(n, 'digit')),
+    toStr: (d) => d.digits.join(','),
+    fromStr: (s) => ({ digits: s.split(',').map(Number) })
+  },
+  qxc: {
+    id: 'qxc', name: '七星彩', color: '#FFD54F', cat: '体彩',
+    desc: '7位数字', defaultChecked: false,
+    rule: '从0000000-9999999中选一个7位数，每位从0-9中选择，号码可重复。每周二、五、日开奖。',
+    generate: () => ({ digits: Array.from({length:7},()=>randInt(0,9)) }),
+    renderBalls: (d) => d.digits.map(n => ball(n, 'digit')),
+    renderOverlayBalls: (d) => d.digits.map(n => oBall(n, 'digit')),
+    renderShouhaoBalls: (d) => d.digits.map(n => sBall(n, 'digit')),
+    toStr: (d) => d.digits.join(','),
+    fromStr: (s) => ({ digits: s.split(',').map(Number) })
+  },
+  qlc: {
+    id: 'qlc', name: '七乐彩', color: '#1ABC9C', cat: '福彩',
+    desc: '1-30选7', defaultChecked: false,
+    rule: '从01-30中选7个号码，号码不可重复。每周一、三、五开奖。',
+    generate: () => ({ nums: pickN(1, 30, 7) }),
+    renderBalls: (d) => d.nums.map(n => ball(n, 'teal')),
+    renderOverlayBalls: (d) => d.nums.map(n => oBall(n, 'teal')),
+    renderShouhaoBalls: (d) => d.nums.map(n => sBall(n, 'teal')),
+    toStr: (d) => d.nums.join(','),
+    fromStr: (s) => ({ nums: s.split(',').map(Number) })
+  },
+  kl8: {
+    id: 'kl8', name: '快乐8', color: '#E91E63', cat: '福彩',
+    desc: '1-80选20', defaultChecked: false,
+    rule: '从01-80中选20个号码，号码不可重复。每天开奖。',
+    generate: () => ({ nums: pickN(1, 80, 20) }),
+    renderBalls: (d) => d.nums.map(n => ball(n, 'pink', true)),
+    renderOverlayBalls: (d) => d.nums.map(n => oBall(n, 'pink', true)),
+    renderShouhaoBalls: (d) => d.nums.map(n => sBall(n, 'pink', true)),
+    toStr: (d) => d.nums.join(','),
+    fromStr: (s) => ({ nums: s.split(',').map(Number) })
+  }
+};
+
+// =============================================
+// 工具函数
+// =============================================
+function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+function pickN(min, max, count) {
+  const pool = [];
+  for (let i = min; i <= max; i++) pool.push(i);
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return pool.slice(0, count).sort((a, b) => a - b);
+}
+
+function pad(n) { return String(n).padStart(2, '0'); }
+
+function ball(n, cls, small) {
+  const el = document.createElement('span');
+  el.className = `ball ${cls}${small ? ' small' : ''}`;
+  el.textContent = typeof n === 'number' ? pad(n) : n;
+  return el;
+}
+function sep() { const el = document.createElement('span'); el.className = 'sep'; return el; }
+
+function oBall(n, cls, small) {
+  const el = document.createElement('span');
+  el.className = `o-ball ${cls}${small ? ' small' : ''}`;
+  el.textContent = typeof n === 'number' ? pad(n) : n;
+  el.style.animationDelay = `${Math.random()*0.2}s`;
+  return el;
+}
+function oSep() { const el = document.createElement('span'); el.className = 'o-sep'; return el; }
+function oZoneLabel(text) { const el = document.createElement('span'); el.className = 'o-zone-label'; el.textContent = text; return el; }
+
+function sBall(n, cls, small) {
+  const el = document.createElement('span');
+  el.className = `ball ${cls}${small ? ' small' : ''}`;
+  el.textContent = typeof n === 'number' ? pad(n) : n;
+  el.style.transform = 'scale(0.85)';
+  return el;
+}
+
+// =============================================
+// 状态
+// =============================================
+let state = {
+  groupCount: 1,
+  selected: new Set(['dlt']),
+  results: {},
+  shouhao: {},         // { lotteryId: data }
+  checkedCards: new Set(), // 'lotteryId-index' keys
+  extraCounts: {},     // 'lotteryId-index': count (追加注数)
+  shouhaoExtraCounts: {}, // 'lotteryId': count (守号追加注数，只在守号弹窗显示)
+};
+
+// =============================================
+// 折叠切换
+// =============================================
+function toggleCollapse(labelEl) {
+  const wrap = labelEl.parentElement.querySelector('.collapse-wrap');
+  const arrow = labelEl.querySelector('.arrow');
+  if (!wrap) return;
+  wrap.classList.toggle('open');
+  if (arrow) arrow.classList.toggle('open');
+}
+
+// =============================================
+// DOM 引用
+// =============================================
+const $ = id => document.getElementById(id);
+const lotteryGrid = $('lotteryGrid');
+const groupCount = $('groupCount');
+const btnMinus = $('btnMinus');
+const btnPlus = $('btnPlus');
+const genBtn = $('genBtn');
+const shouhaoBtn = $('shouhaoBtn');
+const results = $('results');
+const resultsContent = $('resultsContent');
+const resultCount = $('resultCount');
+const emptyState = $('emptyState');
+const zoomSelectedBtn = $('zoomSelectedBtn');
+const zoomCount = $('zoomCount');
+const overlay = $('overlay');
+const oName = $('oName');
+const oGroup = $('oGroup');
+const oContent = $('oContent');
+const oClose = $('oClose');
+const shouhaoModal = $('shouhaoModal');
+const shouhaoContent = $('shouhaoContent');
+const shouhaoClose = $('shouhaoClose');
+const ruleModal = $('ruleModal');
+const rmTitle = $('rmTitle');
+const rmBody = $('rmBody');
+const rmClose = $('rmClose');
+
+// =============================================
+// 守号存储 (localStorage)
+// =============================================
+function loadShouhao() {
+  try {
+    const saved = localStorage.getItem('lotto_shouhao');
+    if (saved) state.shouhao = JSON.parse(saved);
+  } catch(e) {}
+}
+function saveShouhao() {
+  try { localStorage.setItem('lotto_shouhao', JSON.stringify(state.shouhao)); } catch(e) {}
+}
+
+// =============================================
+// 初始化彩票选择器
+// =============================================
+function initLotteryGrid() {
+  lotteryGrid.innerHTML = '';
+  Object.values(LOTTERIES).forEach(l => {
+    const chip = document.createElement('div');
+    chip.className = `lottery-chip${l.defaultChecked ? ' active' : ''}`;
+    chip.style.color = l.color;
+    chip.dataset.id = l.id;
+
+    const ck = document.createElement('span');
+    ck.className = 'ck-box';
+    ck.textContent = '✓';
+
+    const name = document.createElement('span');
+    name.className = 'lname';
+    name.textContent = l.name;
+
+    const info = document.createElement('span');
+    info.className = 'l-info';
+    info.textContent = 'ⓘ';
+    info.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showRuleModal(l);
+    });
+
+    const cat = document.createElement('span');
+    cat.className = 'lcat';
+    cat.textContent = l.cat;
+
+    chip.appendChild(ck);
+    chip.appendChild(name);
+    chip.appendChild(info);
+    chip.appendChild(cat);
+    chip.addEventListener('click', () => toggleLottery(l.id));
+    lotteryGrid.appendChild(chip);
+
+    if (l.defaultChecked) state.selected.add(l.id);
+  });
+}
+
+function toggleLottery(id) {
+  const chips = lotteryGrid.querySelectorAll('.lottery-chip');
+  const chip = Array.from(chips).find(c => c.dataset.id === id);
+  if (!chip) return;
+  if (state.selected.has(id)) {
+    if (state.selected.size <= 1) return;
+    state.selected.delete(id);
+    chip.classList.remove('active');
+  } else {
+    state.selected.add(id);
+    chip.classList.add('active');
+  }
+}
+
+// =============================================
+// 规则说明弹窗
+// =============================================
+function showRuleModal(lotto) {
+  rmTitle.textContent = `${lotto.name} · ${lotto.cat}`;
+  rmTitle.style.color = lotto.color;
+  rmBody.innerHTML = `
+    <div>${lotto.rule}</div>
+    <div class="rm-desc">${lotto.desc} ${lotto.cat === '体彩' ? '🏛️' : '🎯'}</div>
+  `;
+  ruleModal.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeRuleModal() {
+  ruleModal.classList.remove('show');
+  document.body.style.overflow = '';
+}
+rmClose.addEventListener('click', closeRuleModal);
+ruleModal.addEventListener('click', (e) => {
+  if (e.target === ruleModal) closeRuleModal();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { closeRuleModal(); closeOverlay(); closeShouhaoModal(); }
+});
+
+// =============================================
+// 号码生成
+// =============================================
+function generateAll() {
+  const count = parseInt(groupCount.value) || 1;
+  state.groupCount = count;
+  const selectedIds = Array.from(state.selected);
+  if (selectedIds.length === 0) return;
+
+  state.results = {};
+  state.checkedCards = new Set();
+  state.extraCounts = {};
+  state.shouhaoExtraCounts = {};
+
+  selectedIds.forEach(id => {
+    const lotto = LOTTERIES[id];
+    const groups = [];
+
+    for (let i = 0; i < count; i++) {
+      groups.push(lotto.generate());
+    }
+    state.results[id] = groups;
+  });
+
+  renderResults();
+  updateZoomBtn();
+}
+
+// =============================================
+// 追加几注
+// =============================================
+function addGroup(lotteryId, index) {
+  const groups = state.results[lotteryId];
+  if (!groups || groups.length === 0) return;
+  const key = `${lotteryId}-${index}`;
+  // 累加追加注数
+  state.extraCounts[key] = (state.extraCounts[key] || 0) + 1;
+  renderResults();
+  updateZoomBtn();
+}
+
+// =============================================
+// 渲染结果
+// =============================================
+function renderResults() {
+  resultsContent.innerHTML = '';
+  const selectedIds = Array.from(state.selected);
+  let total = 0;
+
+  selectedIds.forEach(id => {
+    const lotto = LOTTERIES[id];
+    const groups = state.results[id];
+    if (!groups || groups.length === 0) return;
+
+    // 计算总注数（原始 + 追加）
+    let sectionTotal = 0;
+    groups.forEach((_, idx) => {
+      sectionTotal += 1 + (state.extraCounts[`${id}-${idx}`] || 0);
+    });
+    total += sectionTotal;
+
+    const section = document.createElement('div');
+    section.className = 'lottery-section';
+
+    // Section header
+    const header = document.createElement('div');
+    header.className = 'lottery-section-header';
+    header.innerHTML = `
+      <span class="ls-dot" style="color:${lotto.color}"></span>
+      <span class="ls-name" style="color:${lotto.color}">${lotto.name} <span style="font-size:10px;color:rgba(255,255,255,0.3);font-weight:400;">${lotto.cat}</span></span>
+      <span class="ls-count">${sectionTotal} 注</span>
+    `;
+    section.appendChild(header);
+
+    // Cards
+    groups.forEach((data, idx) => {
+      const card = document.createElement('div');
+      const ckKey = `${id}-${idx}`;
+      card.className = `num-card glass${state.checkedCards.has(ckKey) ? ' checked' : ''}`;
+      card.dataset.ckKey = ckKey;
+
+      // Checkbox
+      const cbWrap = document.createElement('div');
+      cbWrap.className = 'card-cb';
+      const cbBox = document.createElement('div');
+      cbBox.className = `cb-box${state.checkedCards.has(ckKey) ? ' checked' : ''}`;
+      cbBox.textContent = '✓';
+      cbBox.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleCardCheck(ckKey, card, cbBox);
+      });
+      cbWrap.appendChild(cbBox);
+
+      // Body
+      const body = document.createElement('div');
+      body.className = 'card-body';
+
+      const top = document.createElement('div');
+      top.className = 'card-top';
+
+      const label = document.createElement('span');
+      label.className = 'card-label';
+      const extra = state.extraCounts[ckKey] || 0;
+      label.innerHTML = `第 ${idx + 1} 注${extra > 0 ? ` <span class="extra-badge">追加${extra}注</span>` : ''}`;
+
+      const actions = document.createElement('div');
+      actions.className = 'card-actions';
+
+      const addBtn = document.createElement('button');
+      addBtn.className = 'btn-add';
+      addBtn.textContent = '+';
+      addBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        addGroup(id, idx);
+      });
+
+      const subBtn = document.createElement('button');
+      const hasExtra = (state.extraCounts[ckKey] || 0) > 0;
+      subBtn.className = `btn-add${hasExtra ? '' : ' hidden'}`;
+      subBtn.textContent = '−';
+      subBtn.style.cssText = 'border-color:rgba(231,76,60,0.3);background:rgba(231,76,60,0.1);color:#E74C3C;';
+      subBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const cur = state.extraCounts[ckKey] || 0;
+        if (cur > 0) {
+          state.extraCounts[ckKey] = cur - 1;
+          if (state.extraCounts[ckKey] === 0) delete state.extraCounts[ckKey];
         }
+        renderResults();
+        updateZoomBtn();
+      });
 
-        function getRandomNumbers(count, min, max) {
-            const numbers = [];
-            while (numbers.length < count) {
-                const num = Math.floor(Math.random() * (max - min + 1)) + min;
-                if (!numbers.includes(num)) {
-                    numbers.push(num);
-                }
-            }
-            return numbers;
+      const zoomBtn = document.createElement('button');
+      zoomBtn.className = 'btn-zoom';
+      zoomBtn.textContent = '🔍';
+      zoomBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // 如果已经有选中的卡片，放大选中的；否则放大当前卡片
+        if (state.checkedCards.size > 0) {
+          openOverlayMulti();
+        } else {
+          state.checkedCards.add(ckKey);
+          cbBox.classList.add('checked');
+          card.classList.add('checked');
+          updateZoomBtn();
+          openOverlayMulti();
         }
+      });
 
-        // 打开选中的链接
-        function openLink(selectElement) {
-            const selectedValue = selectElement.value;
-            if (selectedValue) {
-                window.open(selectedValue, '_blank');
-                selectElement.selectedIndex = 0; // 重置下拉框
-            }
+      actions.appendChild(addBtn);
+      actions.appendChild(subBtn);
+      actions.appendChild(zoomBtn);
+
+      // 保存守号按钮
+      const saveShBtn = document.createElement('button');
+      const lotto = LOTTERIES[id];
+      const thisStr = lotto.toStr(data);
+      const isSaved = state.shouhao[id] === thisStr;
+      saveShBtn.className = `btn-save-sh${isSaved ? ' saved' : ''}`;
+      saveShBtn.textContent = isSaved ? '🔒 已存' : '🔒 存';
+      saveShBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (state.shouhao[id] === thisStr) {
+          // 已存则取消保存
+          delete state.shouhao[id];
+        } else {
+          // 未存则保存
+          state.shouhao[id] = thisStr;
         }
+        saveShouhao();
+        renderResults();
+        updateZoomBtn();
+      });
 
-        // 进入全屏模式
-        function enterFullscreen() {
-            const fullscreenContainer = document.getElementById('fullscreenContainer');
-            const fullscreenNumbers = document.getElementById('fullscreenNumbers');
-            const resultNumbers = document.querySelectorAll('.result .numbers');
+      actions.appendChild(saveShBtn);
+      top.appendChild(label);
+      top.appendChild(actions);
+      body.appendChild(top);
 
-            // 将生成的号码复制到全屏容器中
-            fullscreenNumbers.innerHTML = '';
-            resultNumbers.forEach(numbersDiv => {
-                fullscreenNumbers.appendChild(numbersDiv.cloneNode(true));
-            });
+      const ballsWrap = document.createElement('div');
+      ballsWrap.className = 'balls';
+      const elements = lotto.renderBalls(data);
+      elements.forEach(el => ballsWrap.appendChild(el));
+      body.appendChild(ballsWrap);
 
-            // 显示全屏容器，隐藏主容器
-            fullscreenContainer.style.display = 'flex';
-            document.querySelector('.container').style.display = 'none';
-        }
+      card.appendChild(cbWrap);
+      card.appendChild(body);
+      section.appendChild(card);
+    });
 
-        // 退出全屏模式
-        function exitFullscreen() {
-            const fullscreenContainer = document.getElementById('fullscreenContainer');
+    resultsContent.appendChild(section);
+  });
 
-            // 隐藏全屏容器，显示主容器
-            fullscreenContainer.style.display = 'none';
-            document.querySelector('.container').style.display = 'block';
-        }
+  resultCount.textContent = `${total} 注`;
+  results.classList.add('show');
+  emptyState.classList.add('hidden');
 
-        // 动态检测横屏模式并显示/隐藏按钮
-        function updateLandscapeButtonVisibility() {
-            const landscapeButton = document.getElementById('landscapeButton');
-            const isLandscape = window.innerWidth > window.innerHeight; // 判断是否为横屏
-            const isMobile = window.innerWidth <= 768; // 判断是否为移动设备
+  // 滚动到结果
+  setTimeout(() => {
+    results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
 
-            if (isMobile && isLandscape) {
-                landscapeButton.style.display = 'block';
-            } else {
-                landscapeButton.style.display = 'none';
-            }
-        }
+// =============================================
+// 卡片勾选控制
+// =============================================
+function toggleCardCheck(ckKey, card, cbBox) {
+  if (state.checkedCards.has(ckKey)) {
+    state.checkedCards.delete(ckKey);
+    cbBox.classList.remove('checked');
+    card.classList.remove('checked');
+  } else {
+    state.checkedCards.add(ckKey);
+    cbBox.classList.add('checked');
+    card.classList.add('checked');
+  }
+  updateZoomBtn();
+}
 
-        // 初始化时检测一次屏幕方向
-        updateLandscapeButtonVisibility();
+function updateZoomBtn() {
+  const count = state.checkedCards.size;
+  zoomCount.textContent = count;
+  zoomSelectedBtn.disabled = count === 0;
+}
 
-        // 监听屏幕尺寸变化
-        window.addEventListener('resize', updateLandscapeButtonVisibility);
+// =============================================
+// 多选放大
+// =============================================
+zoomSelectedBtn.addEventListener('click', openOverlayMulti);
 
-        // 页面加载完成后滚动到顶部
-        window.onload = () => {
-            window.scrollTo(0, 0);
-        };
-    </script>
+function openOverlayMulti() {
+  const checked = Array.from(state.checkedCards);
+  if (checked.length === 0) return;
+
+  oName.textContent = `选中 ${checked.length} 注`;
+  oName.style.color = '#42A5F5';
+  oGroup.textContent = '';
+
+  oContent.innerHTML = '';
+
+  checked.forEach((ckKey, groupIdx) => {
+    const [lotteryId, idx] = ckKey.split('-');
+    const extra = state.extraCounts[ckKey] || 0;
+    const lotto = LOTTERIES[lotteryId];
+    const groups = state.results[lotteryId];
+    if (!groups || !groups[parseInt(idx)]) return;
+    const data = groups[parseInt(idx)];
+
+    const groupDiv = document.createElement('div');
+    groupDiv.className = 'o-multi-group';
+
+    const label = document.createElement('div');
+    label.className = 'omg-label';
+    label.innerHTML = `${lotto.name} · 第${parseInt(idx)+1}注${extra > 0 ? ` <span class="extra-badge" style="background:linear-gradient(135deg,${lotto.color},#c0392b);box-shadow:0 0 12px rgba(255,107,53,0.3);">追加${extra}注</span>` : ''}`;
+    label.style.color = lotto.color;
+    groupDiv.appendChild(label);
+
+    const ballsDiv = document.createElement('div');
+    ballsDiv.className = 'o-balls';
+    const elements = lotto.renderOverlayBalls(data);
+    elements.forEach(el => ballsDiv.appendChild(el));
+    groupDiv.appendChild(ballsDiv);
+
+    oContent.appendChild(groupDiv);
+  });
+
+  overlay.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+// =============================================
+// 横屏全屏 Overlay (单张卡片)
+// =============================================
+function openOverlay(lotteryId, groupIndex) {
+  const lotto = LOTTERIES[lotteryId];
+  const groups = state.results[lotteryId];
+  if (!groups || groups.length === 0) return;
+
+  oName.textContent = lotto.name;
+  oName.style.color = lotto.color;
+  oGroup.textContent = `${groupIndex+1}/${groups.length}`;
+
+  oContent.innerHTML = '';
+  const data = groups[groupIndex];
+  const groupDiv = document.createElement('div');
+  groupDiv.className = 'o-multi-group';
+  const ballsDiv = document.createElement('div');
+  ballsDiv.className = 'o-balls';
+  const elements = lotto.renderOverlayBalls(data);
+  elements.forEach(el => ballsDiv.appendChild(el));
+  groupDiv.appendChild(ballsDiv);
+  oContent.appendChild(groupDiv);
+
+  overlay.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeOverlay() {
+  overlay.classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+oClose.addEventListener('click', closeOverlay);
+overlay.addEventListener('click', (e) => {
+  if (e.target === overlay) closeOverlay();
+});
+document.addEventListener('keydown', (e) => {
+  if (!overlay.classList.contains('show')) return;
+  if (e.key === 'Escape') closeOverlay();
+});
+
+// =============================================
+// 守号功能
+// =============================================
+shouhaoBtn.addEventListener('click', openShouhaoModal);
+shouhaoClose.addEventListener('click', closeShouhaoModal);
+shouhaoModal.addEventListener('click', (e) => {
+  if (e.target === shouhaoModal) closeShouhaoModal();
+});
+
+function openShouhaoModal() {
+  renderShouhao();
+  shouhaoModal.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeShouhaoModal() {
+  shouhaoModal.classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+function renderShouhao() {
+  shouhaoContent.innerHTML = '';
+  const selectedIds = Array.from(state.selected);
+  let hasAny = false;
+
+  selectedIds.forEach(id => {
+    const lotto = LOTTERIES[id];
+    const saved = state.shouhao[id];
+
+    const item = document.createElement('div');
+    item.className = 'sh-item';
+
+    const header = document.createElement('div');
+    header.className = 'sh-header';
+    header.innerHTML = `<span class="sh-name" style="color:${lotto.color}">${lotto.name} · ${lotto.cat}</span>`;
+
+    const actions = document.createElement('div');
+    actions.className = 'sh-actions';
+
+    const genBtn = document.createElement('button');
+    genBtn.className = 'btn-gen';
+    genBtn.textContent = '随机生成';
+    genBtn.addEventListener('click', () => {
+      const data = lotto.generate();
+      state.shouhao[id] = lotto.toStr(data);
+      saveShouhao();
+      renderShouhao();
+      // 如果已生成结果，刷新卡片上的保存状态
+      if (state.results[id]) renderResults();
+    });
+
+    const clearBtn = document.createElement('button');
+    clearBtn.className = 'btn-clear';
+    clearBtn.textContent = '✕';
+    clearBtn.addEventListener('click', () => {
+      delete state.shouhao[id];
+      saveShouhao();
+      renderShouhao();
+      if (state.results[id]) renderResults();
+    });
+
+    actions.appendChild(genBtn);
+    if (saved) actions.appendChild(clearBtn);
+    header.appendChild(actions);
+    item.appendChild(header);
+
+    if (saved) {
+      hasAny = true;
+      const data = lotto.fromStr(saved);
+      const shExtra = state.shouhaoExtraCounts[id] || 0;
+
+      // 号码 + 追加注数标签
+      const ballsRow = document.createElement('div');
+      ballsRow.style.cssText = 'display:flex;align-items:center;gap:8px;flex-wrap:wrap;';
+
+      const ballsWrap = document.createElement('div');
+      ballsWrap.className = 'sh-balls';
+      const elements = lotto.renderShouhaoBalls(data);
+      elements.forEach(el => ballsWrap.appendChild(el));
+      ballsRow.appendChild(ballsWrap);
+
+      if (shExtra > 0) {
+        const extraBadge = document.createElement('span');
+        extraBadge.className = 'extra-badge';
+        extraBadge.textContent = `追加${shExtra}注`;
+        extraBadge.style.cssText = 'font-size:13px;font-weight:900;padding:2px 12px;border-radius:12px;background:linear-gradient(135deg,#FF6B35,#e85d2c);color:#fff;box-shadow:0 0 16px rgba(255,107,53,0.5);animation:extraPulse 1.2s ease-in-out infinite;letter-spacing:0.5px;';
+        ballsRow.appendChild(extraBadge);
+      }
+
+      item.appendChild(ballsRow);
+
+      // 放大 + 追加 按钮
+      const row = document.createElement('div');
+      row.className = 'sh-actions-row';
+
+      const zoomBtn = document.createElement('button');
+      zoomBtn.className = 'btn-sh-zoom';
+      zoomBtn.textContent = '🔍 放大';
+      zoomBtn.addEventListener('click', () => {
+        openShouhaoOverlay(id, data, shExtra);
+      });
+
+      const addBtn = document.createElement('button');
+      addBtn.className = 'btn-sh-add';
+      addBtn.textContent = '➕ 追加';
+      addBtn.addEventListener('click', () => {
+        addShouhaoToResults(id, lotto, saved);
+      });
+
+      row.appendChild(zoomBtn);
+      row.appendChild(addBtn);
+      item.appendChild(row);
+    } else {
+      const empty = document.createElement('div');
+      empty.style.cssText = 'color:rgba(255,255,255,0.2);font-size:13px;padding:6px 0;';
+      empty.textContent = '暂未设置守号，点击「随机生成」或先生成号码再「保存守号」';
+      item.appendChild(empty);
+    }
+
+    shouhaoContent.appendChild(item);
+  });
+
+  if (!hasAny && selectedIds.length > 0) {
+    // 如果没有任何守号，在最后加个提示
+  }
+}
+
+// =============================================
+// 守号放大 & 追加
+// =============================================
+function openShouhaoOverlay(lotteryId, data, extraCount) {
+  const lotto = LOTTERIES[lotteryId];
+  oName.textContent = `${lotto.name} · 守号`;
+  oName.style.color = lotto.color;
+  oGroup.textContent = '';
+
+  oContent.innerHTML = '';
+  const groupDiv = document.createElement('div');
+  groupDiv.className = 'o-multi-group';
+
+  if (extraCount && extraCount > 0) {
+    const label = document.createElement('div');
+    label.className = 'omg-label';
+    label.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;margin-bottom:8px;';
+    const badge = document.createElement('span');
+    badge.className = 'extra-badge';
+    badge.textContent = `追加${extraCount}注`;
+    badge.style.cssText = 'font-size:14px;font-weight:900;padding:2px 14px;border-radius:12px;background:linear-gradient(135deg,#FF6B35,#e85d2c);color:#fff;box-shadow:0 0 16px rgba(255,107,53,0.5);animation:extraPulse 1.2s ease-in-out infinite;letter-spacing:0.5px;';
+    label.appendChild(badge);
+    groupDiv.appendChild(label);
+  }
+
+  const ballsDiv = document.createElement('div');
+  ballsDiv.className = 'o-balls';
+  const elements = lotto.renderOverlayBalls(data);
+  elements.forEach(el => ballsDiv.appendChild(el));
+  groupDiv.appendChild(ballsDiv);
+  oContent.appendChild(groupDiv);
+
+  overlay.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function addShouhaoToResults(lotteryId, lotto, savedStr) {
+  // 只在守号弹窗里累积追加注数，不影响主界面
+  state.shouhaoExtraCounts[lotteryId] = (state.shouhaoExtraCounts[lotteryId] || 0) + 1;
+  saveShouhao();
+  renderShouhao();
+}
+
+// =============================================
+// 事件绑定
+// =============================================
+btnMinus.addEventListener('click', () => {
+  let v = parseInt(groupCount.value) || 1;
+  if (v > 1) { v--; groupCount.value = v; }
+});
+btnPlus.addEventListener('click', () => {
+  let v = parseInt(groupCount.value) || 1;
+  if (v < 99) { v++; groupCount.value = v; }
+});
+groupCount.addEventListener('input', () => {
+  let v = parseInt(groupCount.value) || 1;
+  if (v < 1) v = 1; if (v > 99) v = 99;
+  groupCount.value = v;
+});
+
+genBtn.addEventListener('click', generateAll);
+
+// =============================================
+// 启动
+// =============================================
+loadShouhao();
+initLotteryGrid();
+</script>
 </body>
 </html>
